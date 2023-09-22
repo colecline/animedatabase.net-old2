@@ -25,12 +25,10 @@ class UserService {
 		email: string,
 		password: string
 	): Promise<Omit<User, "password">> {
-		// Check if username already exists
 		if (await this.#isUsernameTaken(username)) {
 			throw ApplicationError.badRequest("Username already exists");
 		}
 
-		// Check if email already exists
 		if (await this.#isEmailTaken(email)) {
 			throw ApplicationError.badRequest("Email already exists");
 		}
