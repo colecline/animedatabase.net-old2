@@ -8,6 +8,11 @@ class UserService {
 		return user ? true : false;
 	}
 
+	async #isEmailTaken(email: string): Promise<boolean> {
+		const user = await prisma.user.findUnique({ where: { email } });
+		return user ? true : false;
+	}
+
 	async createUser(
 		username: string,
 		email: string,
@@ -15,6 +20,10 @@ class UserService {
 	): Promise<Omit<User, "password">> {
 		if (await this.#isUsernameTaken(username)) {
 			throw ApplicationError.badRequest("Username already exists");
+		}
+
+		if (await this.#isEmailTaken(email)) {
+			throw ApplicationError.badRequest("Email already exists");
 		}
 
 		// TODO: check if email is taken
