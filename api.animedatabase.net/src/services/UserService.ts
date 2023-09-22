@@ -1,13 +1,22 @@
 import prisma from "../database/prismaClient";
 import { User } from "@prisma/client";
+import { ApplicationError } from "../errors/ApplicationError";
 
 class UserService {
+	async #isUsernameTaken(username: string): Promise<boolean> {
+		const user = await prisma.user.findUnique({ where: { username } });
+		return user ? true : false;
+	}
+
 	async createUser(
 		username: string,
 		email: string,
 		password: string
 	): Promise<Omit<User, "password">> {
-		// TODO: check if username is taken
+		if (await this.#isUsernameTaken(username)) {
+			throw ApplicationError.badRequest("Username already exists");
+		}
+
 		// TODO: check if email is taken
 		// TODO: validate password
 		// TODO: hash password
