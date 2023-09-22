@@ -18,15 +18,16 @@ class UserService {
 		email: string,
 		password: string
 	): Promise<Omit<User, "password">> {
+		// Check if username already exists
 		if (await this.#isUsernameTaken(username)) {
 			throw ApplicationError.badRequest("Username already exists");
 		}
 
+		// Check if email already exists
 		if (await this.#isEmailTaken(email)) {
 			throw ApplicationError.badRequest("Email already exists");
 		}
 
-		// TODO: check if email is taken
 		// TODO: validate password
 		// TODO: hash password
 		const user = await prisma.user.create({
