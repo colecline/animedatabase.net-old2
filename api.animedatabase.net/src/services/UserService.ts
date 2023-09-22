@@ -1,4 +1,5 @@
 import prisma from "../database/prismaClient";
+import bcrypt from "bcrypt";
 import { User } from "@prisma/client";
 import { ApplicationError } from "../errors/ApplicationError";
 
@@ -11,6 +12,12 @@ class UserService {
 	async #isEmailTaken(email: string): Promise<boolean> {
 		const user = await prisma.user.findUnique({ where: { email } });
 		return user ? true : false;
+	}
+
+	async #hashPassword(password: string): Promise<string> {
+		const saltRounds = 10;
+		const hashedPassword = await bcrypt.hash(password, saltRounds);
+		return hashedPassword;
 	}
 
 	async createUser(
@@ -28,12 +35,13 @@ class UserService {
 			throw ApplicationError.badRequest("Email already exists");
 		}
 
-		// TODO: hash password
+		const hashedPassword = await this.#hashPassword(password);
+
 		const user = await prisma.user.create({
 			data: {
 				username,
 				email,
-				password,
+				password: hashedPassword,
 			},
 			select: {
 				id: true,
