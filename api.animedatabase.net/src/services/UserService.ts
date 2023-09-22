@@ -28,7 +28,6 @@ class UserService {
 			throw ApplicationError.badRequest("Email already exists");
 		}
 
-		// TODO: validate password
 		// TODO: hash password
 		const user = await prisma.user.create({
 			data: {
