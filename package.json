@@ -1,0 +1,5 @@
+{
+  "devDependencies": {
+    "jest-mock-extended": "^2.0.4"
+  }
+}
