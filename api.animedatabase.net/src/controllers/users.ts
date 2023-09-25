@@ -45,3 +45,18 @@ export const POST_USERS_LOGIN = async (
 		});
 	})(req, res, next);
 };
+
+export const POST_USERS_LOGOUT = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<void> => {
+	res.clearCookie("sessionId");
+	req.logout(function (err) {
+		if (err) next(err);
+
+		req.session.destroy(function (err) {
+			res.status(200).json("You are now logged out");
+		});
+	});
+};
