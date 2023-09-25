@@ -2,7 +2,7 @@ import express, { Request, Response, NextFunction } from "express";
 import { ApplicationError } from "../errors/ApplicationError";
 
 export default function ErrorHandler(
-	err: ApplicationError,
+	err: any, // temp fix, was ApplicationError
 	req: Request,
 	res: Response,
 	next: NextFunction
@@ -13,6 +13,11 @@ export default function ErrorHandler(
 
 	if (err instanceof ApplicationError) {
 		res.status(err.statusCode).json(err.message);
+		return;
+	}
+
+	if (err.name === "AuthenticationError") {
+		res.status(401).json(err.message);
 		return;
 	}
 

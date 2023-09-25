@@ -1,5 +1,13 @@
 import { Request, Response, NextFunction } from "express";
 import UserService from "../services/UserService";
+import session from "express-session";
+import passport = require("passport");
+import { ApplicationError } from "../errors/ApplicationError";
+import { User } from "@prisma/client";
+
+interface ExtendedSession extends session.Session {
+	userId?: string;
+}
 
 export const POSTS_USERS = async (
 	req: Request,
@@ -13,4 +21,27 @@ export const POSTS_USERS = async (
 	} catch (error) {
 		next(error);
 	}
+};
+
+export const POST_USERS_LOGIN = async (
+	req: Request,
+	res: Response,
+	next: NextFunction
+): Promise<void> => {
+	passport.authenticate("local", (err: any, user: User) => {
+		if (err) {
+			return next(err);
+		}
+		if (!user) {
+			return next(
+				ApplicationError.badRequest("Invalid username or password")
+			);
+		}
+		req.logIn(user, (err) => {
+			if (err) {
+				return next(err);
+			}
+			return res.status(200).json(user);
+		});
+	})(req, res, next);
 };

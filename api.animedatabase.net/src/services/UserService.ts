@@ -14,10 +14,35 @@ class UserService {
 		return user ? true : false;
 	}
 
+	async #omitPasswordFromUser(user: User): Promise<Omit<User, "password">> {
+		const { password, ...userWithoutPassword } = user;
+		return userWithoutPassword;
+	}
+
 	async #hashPassword(password: string): Promise<string> {
 		const saltRounds = 10;
 		const hashedPassword = await bcrypt.hash(password, saltRounds);
 		return hashedPassword;
+	}
+
+	async #comparePasswords(
+		password: string,
+		hashedPassword: string
+	): Promise<boolean> {
+		try {
+			const match = await bcrypt.compare(password, hashedPassword);
+			if (!match) {
+				return false;
+			}
+			return true;
+		} catch (err) {
+			throw ApplicationError.internal("Something went wrong");
+		}
+	}
+
+	async #authenticateUser(user: User, password: string): Promise<boolean> {
+		const result = await this.#comparePasswords(password, user.password);
+		return result ? true : false;
 	}
 
 	async createUser(
@@ -51,6 +76,30 @@ class UserService {
 		});
 
 		return user;
+	}
+
+	async loginUser(
+		username: string,
+		password: string
+	): Promise<Omit<User, "password">> {
+		const user = await prisma.user.findUnique({ where: { username } });
+		if (!user) {
+			throw ApplicationError.badRequest("Incorrect username");
+		}
+
+		const isAuthenticated = await this.#authenticateUser(user, password);
+		if (!isAuthenticated) {
+			throw ApplicationError.badRequest("Incorrect password");
+		}
+		return await this.#omitPasswordFromUser(user);
+	}
+
+	async findUserById(id: number): Promise<Omit<User, "password">> {
+		const user = await prisma.user.findUnique({ where: { id } });
+		if (!user) {
+			throw new ApplicationError(404, "User not found");
+		}
+		return await this.#omitPasswordFromUser(user);
 	}
 }
 
