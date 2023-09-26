@@ -5,7 +5,7 @@ import { Formik, Form, Field, ErrorMessage } from "formik";
 import {
 	stepOneUserValidationSchema,
 	stepTwoUserValidationSchema,
-} from "../util/user.validator";
+} from "../../util/user.validator";
 import { toFormikValidationSchema } from "zod-formik-adapter";
 import { useRouter } from "next/navigation";
 
