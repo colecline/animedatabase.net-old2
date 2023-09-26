@@ -1,7 +1,9 @@
+import TestDashboard from "../../components/TestDashboard";
+
 export default function Page() {
 	return (
 		<div>
-			<p>AnimeDatabase.net</p>
+			<TestDashboard />
 		</div>
 	);
 }

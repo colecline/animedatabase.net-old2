@@ -18,3 +18,8 @@ export const stepTwoUserValidationSchema = z.object({
 			"You must agree to the terms of service"
 		),
 });
+
+export const loginValidationSchema = z.object({
+	username: z.string(),
+	password: z.string(),
+});
