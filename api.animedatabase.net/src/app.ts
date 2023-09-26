@@ -1,30 +1,25 @@
+import express, { Express } from "express";
+import cors from "cors";
 import dotenv from "dotenv";
+import passport from "passport";
+
 dotenv.config();
 
-import express, { Express, Request, Response } from "express";
-import cors from "cors";
 import sessionConfig from "./config/session.config";
-import ErrorHandler from "./middlewares/ErrorHandler";
-import usersRouter from "./routes/users";
-import passport from "passport";
 import "./config/passport.config";
+
+import ErrorHandler from "./middlewares/ErrorHandler";
+
+import userRouter from "./routes/user";
+import usersRouter from "./routes/users";
 
 const app: Express = express();
 
-const allowedOrigin = process.env.ALLOWED_ORIGIN || "http://localhost:3000";
 const corsOptions = {
-	origin: (
-		origin: string | undefined,
-		callback: (err: Error | null, allow?: boolean) => void
-	) => {
-		if (!origin || origin === allowedOrigin) {
-			callback(null, true);
-		} else {
-			callback(new Error("Not allowed by CORS"));
-		}
-	},
-	methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+	origin: "http://localhost:3000",
 	credentials: true,
+	methods: "POST,GET,PUT,DELETE,OPTIONS",
+	allowedHeaders: "Content-Type,Authorization",
 };
 
 app.use(express.json());
@@ -34,6 +29,7 @@ app.use(sessionConfig);
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use("/user", userRouter);
 app.use("/users", usersRouter);
 
 const PORT = process.env.PORT || 3010;

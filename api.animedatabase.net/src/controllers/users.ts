@@ -5,10 +5,6 @@ import passport = require("passport");
 import { ApplicationError } from "../errors/ApplicationError";
 import { User } from "@prisma/client";
 
-interface ExtendedSession extends session.Session {
-	userId?: string;
-}
-
 export const POSTS_USERS = async (
 	req: Request,
 	res: Response,
