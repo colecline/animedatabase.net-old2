@@ -1,1 +1,3 @@
-# AnimeDatabse.net
+## AnimeDatabase.net
+
+In development!
