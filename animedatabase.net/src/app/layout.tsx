@@ -1,7 +1,8 @@
 import type { ReactNode } from "react";
 import { cn } from "@/lib/utils";
-import { Inter as FontSans } from "next/font/google";
+
 import "@/styles/globals.css";
+import { Inter as FontSans } from "next/font/google";
 import { ThemeProvider } from "@/contexts/ThemeProvider";
 
 type RootLayoutProps = {
