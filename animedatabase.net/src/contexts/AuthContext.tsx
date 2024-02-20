@@ -7,6 +7,11 @@ interface User {
 	username: string;
 	email: string;
 	createdAt: Date;
+	profilePicture?: string; // optional
+	displayName?: string; // Optional displayName
+	bio?: string; // Optional bio
+	location?: string; // Optional location
+	website?: string; // Optional website
 }
 
 interface AuthContextProps {
@@ -18,11 +23,7 @@ interface AuthContextProps {
 
 const AuthContext = createContext<Partial<AuthContextProps>>({});
 
-export default function AuthProvider({
-	children,
-}: {
-	children: React.ReactNode;
-}) {
+export default function AuthProvider({ children }: { children: React.ReactNode }) {
 	const [user, setUser] = useState(null);
 	const [loading, setLoading] = useState(true);
 
@@ -50,6 +51,7 @@ export default function AuthProvider({
 		try {
 			const res = await fetch("http://localhost:3010/users/logout", {
 				method: "POST",
+				credentials: "include",
 			});
 
 			if (!res.ok) throw new Error("Logout failed");
@@ -81,11 +83,7 @@ export default function AuthProvider({
 		fetchCurrentUser();
 	}, []);
 
-	return (
-		<AuthContext.Provider value={{ user, login, logout, loading }}>
-			{children}
-		</AuthContext.Provider>
-	);
+	return <AuthContext.Provider value={{ user, login, logout, loading }}>{children}</AuthContext.Provider>;
 }
 
 export function useAuth() {

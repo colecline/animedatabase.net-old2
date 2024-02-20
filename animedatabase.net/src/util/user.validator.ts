@@ -11,12 +11,7 @@ export const stepOneUserValidationSchema = z.object({
 export const stepTwoUserValidationSchema = z.object({
 	email: z.string().email("Invalid email address"),
 	password: passwordValidationSchema,
-	terms: z
-		.boolean()
-		.refine(
-			(value) => value === true,
-			"You must agree to the terms of service"
-		),
+	terms: z.boolean().refine((value) => value === true, "You must agree to the terms of service"),
 });
 
 export const loginValidationSchema = z.object({

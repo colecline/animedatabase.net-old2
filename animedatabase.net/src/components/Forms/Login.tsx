@@ -32,7 +32,7 @@ export default function LoginForm() {
 			validateOnChange={true}
 		>
 			{({ status }) => (
-				<Form className="border border-zinc-300 p-10 rounded-md">
+				<Form className="border border-zinc-300 bg-white p-10 rounded-md">
 					<div>
 						<h3 className="font-bold text-2xl">Login</h3>
 						<p className="text-sm text-zinc-500 mt-1">

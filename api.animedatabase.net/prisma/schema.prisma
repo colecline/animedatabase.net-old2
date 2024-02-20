@@ -8,10 +8,87 @@ datasource db {
   relationMode = "prisma"
 }
 
+enum Role {
+  OWNER
+  ADMIN
+  MODERATOR
+  PREMIUM
+  USER
+}
+
+enum SubmissionType {
+  ADD_ANIME
+  EDIT_ANIME
+  DELETE_ANIME
+}
+
+enum LogType {
+  SUBMISSION_CREATED
+  SUBMISSION_STATUS_CHANGED
+  SUBMISSION_COMMENTED
+  ACTION_CREATED
+  ACTION_STATUS_CHANGED
+  ACTION_EDITED
+  ACTION_COMMENTED
+}
+
 model User {
-  id        Int      @id @default(autoincrement())
-  username  String   @unique
-  email     String   @unique
-  password  String
+  id       Int    @id @default(autoincrement())
+  username String @unique
+  email    String @unique
+  password String
+  role     Role   @default(USER)
+
+  displayName    String?
+  profilePicture String?
+  bio            String?
+  location       String?
+  website        String?
+
+  isVerified       Boolean @default(false)
+  experiencePoints Int     @default(0)
+  followersCount   Int     @default(0)
+  followingCount   Int     @default(0)
+
+  createdAt  DateTime     @default(now())
+  Submission Submission[]
+  Log        Log[]
+}
+
+model Submission {
+  id        Int            @id @default(autoincrement())
+  userId    Int
+  type      SubmissionType
+  status    String         @default("pending")
+  user      User           @relation(fields: [userId], references: [id])
+  actions   Action[]
+  logs      Log[]
+  createdAt DateTime       @default(now())
+}
+
+model Action {
+  id           Int    @id @default(autoincrement())
+  submissionId Int
+  userId       Int
+  target       String
+  targetField  String
+  content      String
+
+  createdAt  DateTime   @default(now())
+  Submission Submission @relation(fields: [submissionId], references: [id])
+  Log        Log[]
+}
+
+model Log {
+  id           Int        @id @default(autoincrement())
+  actionType   LogType
+  details      String
+  userId       Int
+  user         User       @relation(fields: [userId], references: [id])
+  submissionId Int
+  submission   Submission @relation(fields: [submissionId], references: [id])
+  actionId     Int?
+  action       Action?    @relation(fields: [actionId], references: [id])
+
   createdAt DateTime @default(now())
 }

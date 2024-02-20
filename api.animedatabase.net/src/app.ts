@@ -10,6 +10,7 @@ import "./config/passport.config";
 
 import ErrorHandler from "./middlewares/ErrorHandler";
 
+import submissionsRouter from "./routes/submissions";
 import userRouter from "./routes/user";
 import usersRouter from "./routes/users";
 
@@ -18,7 +19,7 @@ const app: Express = express();
 const corsOptions = {
 	origin: "http://localhost:3000",
 	credentials: true,
-	methods: "POST,GET,PUT,DELETE,OPTIONS",
+	methods: "POST,GET,PUT,DELETE,OPTIONS,PATCH",
 	allowedHeaders: "Content-Type,Authorization",
 };
 
@@ -29,6 +30,7 @@ app.use(sessionConfig);
 app.use(passport.initialize());
 app.use(passport.session());
 
+app.use("/submissions", submissionsRouter);
 app.use("/user", userRouter);
 app.use("/users", usersRouter);
 

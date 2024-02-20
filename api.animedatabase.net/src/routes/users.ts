@@ -6,6 +6,7 @@ import { CreateUserSchema } from "../validators/users.validator";
 const router = express.Router();
 
 router.post("/", validate(CreateUserSchema), UsersController.POSTS_USERS);
+router.get("/:username", UsersController.GET_USERS);
 router.post("/login", UsersController.POST_USERS_LOGIN);
 router.post("/logout", UsersController.POST_USERS_LOGOUT);
 

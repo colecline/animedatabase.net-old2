@@ -19,10 +19,38 @@ class UserService {
 		return userWithoutPassword;
 	}
 
+	async #omitEmailAndPasswordFromUser(
+		user: User
+	): Promise<Omit<User, "email" | "password">> {
+		const { email, ...userWithoutEmail } = user;
+		const { password, ...userWithoutEmailAndPassword } = userWithoutEmail;
+		return userWithoutEmailAndPassword;
+	}
+
 	async #hashPassword(password: string): Promise<string> {
 		const saltRounds = 10;
 		const hashedPassword = await bcrypt.hash(password, saltRounds);
 		return hashedPassword;
+	}
+
+	async #sanitizeUpdateInput(input: any): Promise<any> {
+		const allowedUpdateFields = [
+			"displayName",
+			"profilePicture",
+			"bio",
+			"location",
+			"website",
+		];
+
+		const sanitizedInput: any = {};
+		for (const field of allowedUpdateFields) {
+			if (field in input) {
+				sanitizedInput[field] = input[field];
+			}
+		}
+
+		console.log("Sanitized Input: ", sanitizedInput);
+		return sanitizedInput;
 	}
 
 	async #comparePasswords(
@@ -71,6 +99,16 @@ class UserService {
 				username: true,
 				email: true,
 				password: false,
+				role: true,
+				displayName: true,
+				profilePicture: true,
+				bio: true,
+				location: true,
+				website: true,
+				isVerified: true,
+				experiencePoints: true,
+				followersCount: true,
+				followingCount: true,
 				createdAt: true,
 			},
 		});
@@ -100,6 +138,79 @@ class UserService {
 			throw new ApplicationError(404, "User not found");
 		}
 		return await this.#omitPasswordFromUser(user);
+	}
+
+	async findUserByUsername(
+		username: string
+	): Promise<Omit<User, "password" | "email">> {
+		const user = await prisma.user.findUnique({ where: { username } });
+		if (!user) {
+			throw new ApplicationError(404, "User not found");
+		}
+		return await this.#omitEmailAndPasswordFromUser(user);
+	}
+
+	async updateUserProfile(
+		userId: number,
+		updates: Partial<User>
+	): Promise<Omit<User, "password">> {
+		const sanitizedUpdatedUserInput = await this.#sanitizeUpdateInput(
+			updates
+		);
+		const updatedUser = await prisma.user.update({
+			where: { id: userId },
+			data: sanitizedUpdatedUserInput,
+			select: {
+				id: true,
+				username: true,
+				email: true,
+				password: false,
+				role: true,
+				displayName: true,
+				profilePicture: true,
+				bio: true,
+				location: true,
+				website: true,
+				isVerified: true,
+				experiencePoints: true,
+				followersCount: true,
+				followingCount: true,
+				createdAt: true,
+			},
+		});
+		if (!updatedUser) throw ApplicationError.notFound("User not found");
+		console.log("Updated User: ", updatedUser);
+		return updatedUser;
+	}
+
+	async updateProfilePicture(
+		userId: number,
+		newImageUrl: string
+	): Promise<Omit<User, "email" | "password">> {
+		const user = await prisma.user.update({
+			where: { id: userId },
+			data: {
+				profilePicture: newImageUrl,
+			},
+			select: {
+				id: true,
+				username: true,
+				email: false,
+				password: false,
+				role: true,
+				displayName: true,
+				profilePicture: true,
+				bio: true,
+				location: true,
+				website: true,
+				isVerified: true,
+				experiencePoints: true,
+				followersCount: true,
+				followingCount: true,
+				createdAt: true,
+			},
+		});
+		return user;
 	}
 }
 
